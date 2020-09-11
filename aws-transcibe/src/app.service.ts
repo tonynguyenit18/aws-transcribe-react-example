@@ -17,7 +17,7 @@ export class AppService {
 
     const s3 = new AWS.S3();
     const params = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Bucket: `${process.env.AWS_S3_BUCKET_NAME}`,
       Key: audio.originalname,
       Body: audio.buffer,
       ContentType: audio.mimetype,
@@ -30,7 +30,7 @@ export class AppService {
     // Create aws transcribe job
     const transcribeService = new AWS.TranscribeService();
 
-    const TranscriptionJobName = `tony-test-${new Date().getTime()}`;
+    const TranscriptionJobName = audio.originalname;
 
     const res = await transcribeService
       .startTranscriptionJob({

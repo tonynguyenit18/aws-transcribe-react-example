@@ -13,7 +13,6 @@ function App() {
     isRecording: false,
     blobURL: "",
     isBlocked: false,
-    file: undefined,
   });
   const [infor, setInfor] = useState("");
 
@@ -40,43 +39,40 @@ function App() {
     navigator.mediaDevices.getUserMedia(
       { audio: true },
       () => {
-        console.log("Permission Granted")
+        console.log("Permission Granted");
         setAudioDetails((audioDetails) => {
-          const tmpAudioDetails = { ...audioDetails, isBlocked: false }
-          return tmpAudioDetails
-        })
+          const tmpAudioDetails = { ...audioDetails, isBlocked: false };
+          return tmpAudioDetails;
+        });
       },
       () => {
-        console.log("Permission Denied")
-        setInfor("This browser is not supported")
+        console.log("Permission Denied");
+        setInfor("This browser is not supported");
         setAudioDetails((audioDetails) => {
-          const tmpAudioDetails = { ...audioDetails, isBlocked: true }
-          return tmpAudioDetails
-        })
+          const tmpAudioDetails = { ...audioDetails, isBlocked: true };
+          return tmpAudioDetails;
+        });
       }
-    )
+    );
   }, []);
 
   const stop = () => {
     Mp3Recorder.stop()
       .getMp3()
       .then(async ([buffer, blob]) => {
-        const file = new File(buffer, "audio", { type: "audio/mp3" });
         const blobURL = URL.createObjectURL(blob);
-        const fileURL = URL.createObjectURL(file);
         setInfor(`Uploading audio to server...`);
         setAudioDetails((audioDetails) => {
           const tmpAudioDetails = {
             ...audioDetails,
             blobURL: blobURL,
             isRecording: false,
-            file: fileURL,
           };
           return tmpAudioDetails;
         });
 
         const formData = new FormData();
-        formData.append("file", file, "audio.mp3");
+        formData.append("file", blob, `questionId-${new Date().getTime()}.mp3`);
         const response = await axios.post("/aws/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
